@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import { SECRET_ACCES_TOKEN } from "../config/index.js";
 import Blacklist from "../models/Blacklist.js";
+
 export async function Verify(req, res, next) {
     try {
         const authHeader = req.headers["cookie"];
@@ -9,7 +10,6 @@ export async function Verify(req, res, next) {
         const cookie = authHeader.split("=")[1];
         const accessToken = cookie.split(";")[0];
         const checkIfBlacklisted = await Blacklist.findOne({ token: accessToken });
-        console.log(accessToken);
         if (checkIfBlacklisted)
             return res.status(401).json({ message: "This session has expired. Please login" });
         ///Daca exista, mentine doar jwt-ul

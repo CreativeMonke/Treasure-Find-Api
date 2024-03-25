@@ -33,6 +33,5 @@ app.get("/admin",Verify,VerifyRole, (req,res) => {
         message:"Welcome to the Admin portal!",
     })
 })
-
 app.get("/logout",Logout);
 export default app;

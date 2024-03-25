@@ -30,6 +30,15 @@ const UserSchema = new mongoose.Schema(
             select: false,
             max: 40,
         },
+        town:{
+            type: String,
+            required : false,
+            max: 20,
+        },
+        team:{
+            type: String,
+            default : "default",  
+        },
         role: {
             type : String,
             required: true,
