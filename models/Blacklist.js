@@ -1,15 +1,15 @@
 ///Log out login
 ///-> By blacklisting user cookie
-
+import { userDb } from "../config/databaseConfig.js"
 import mongoose from "mongoose";
 
 const BlacklistSchema = new mongoose.Schema(
     {
-        token:{
+        token: {
             type: String,
             required: true,
             ref: "User",
         },
-    },{timestamps: true}
+    }, { timestamps: true }
 );
-export default mongoose.model("blacklist",BlacklistSchema);
+export default userDb.model("blacklist", BlacklistSchema);

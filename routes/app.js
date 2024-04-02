@@ -2,6 +2,7 @@ import express from "express"; // import the express module
 import Auth from "./auth.js"
 import { Verify, VerifyRole } from "../middleware/verify.js";
 import { Logout } from "../controllers/auth.js";
+import locationRoutes from "./locationsRoutes.js"
 const app = express(); // Create an app object
 app.use("/auth",Auth);
 app.disable("x-powered-by"); // Reduce fingerprinting (optional)
@@ -34,4 +35,5 @@ app.get("/admin",Verify,VerifyRole, (req,res) => {
     })
 })
 app.get("/logout",Logout);
+app.use(locationRoutes)
 export default app;
