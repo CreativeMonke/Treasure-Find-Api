@@ -7,7 +7,7 @@ import App from "./routes/app.js";
 
 const server = express();
 const corsOptions = {
-    origin: 'https://treasure-find.vercel.app', // Update to your front-end app's domain
+    origin: '*', // Update to your front-end app's domain (change *)
     credentials: true, // Allow credentials (cookies, authentication tokens) to be sent
 };
 
