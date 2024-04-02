@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import { PORT } from "./config/index.js";
 import App from "./routes/app.js";
 
+
+const server = express();
 const corsOptions = {
     origin: 'https://treasure-find.vercel.app', // Update to your front-end app's domain
     credentials: true, // Allow credentials (cookies, authentication tokens) to be sent
