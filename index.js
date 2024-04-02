@@ -5,11 +5,11 @@ import { PORT } from "./config/index.js";
 import App from "./routes/app.js";
 
 const corsOptions = {
-    origin: 'https://treasure-find.vercel.app', 
-    credentials: true, 
+    origin: 'https://treasure-find.vercel.app', // Update to your front-end app's domain
+    credentials: true, // Allow credentials (cookies, authentication tokens) to be sent
 };
 
-app.use(cors(corsOptions));
+server.use(cors(corsOptions));
 
 server.disable("x-powered-by");
 server.use(cookieParser());
