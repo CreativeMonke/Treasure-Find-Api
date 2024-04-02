@@ -4,12 +4,13 @@ import cookieParser from "cookie-parser";
 import { PORT } from "./config/index.js";
 import App from "./routes/app.js";
 
-const server = express();
 const corsOptions = {
-    origin: "https://treasure-find.vercel.app",
-    credentials: true,
-}
-server.use(cors());
+    origin: 'https://treasure-find.vercel.app', 
+    credentials: true, 
+};
+
+app.use(cors(corsOptions));
+
 server.disable("x-powered-by");
 server.use(cookieParser());
 server.use(express.urlencoded({ extended: false }));
