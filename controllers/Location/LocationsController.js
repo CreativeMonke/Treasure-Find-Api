@@ -19,6 +19,7 @@ export async function createLocation(req, res) {
             message: "Location created successfully",
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({
             status: "error",
             code: 500,
@@ -50,6 +51,7 @@ export async function editLocation(req, res) {
         message: "Location updated successfully!",
       });
     } catch (err) {
+      console.error(err);
       res.status(500).json({
         status: "error",
         message: "Internal Server Error"
@@ -73,6 +75,7 @@ export async function deleteLocation(req,res){
             message: "Location deleted successfully",
         });
     }catch(err){
+        console.error(err);
         res.status(500).json({
             status: "error",
             message: "Internal server error",
@@ -94,6 +97,7 @@ export async function getAllLocations(req,res){
             message: "Locations fetched successfully",
         });
     }catch(err){
+        console.error(err);
         res.status(500).json({
             status: "error",
             message: "Internal server error",
