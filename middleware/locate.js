@@ -15,7 +15,6 @@ const locateMiddleware = async (req, res, next) => {
 
     // If the location exists, attach it to the request object so
     // it can be accessed in the subsequent controller without having to query again.
-    req.location = location;
     next();
   } catch (error) {
     // If there's an error in searching for the location, such as an invalid ID format:
