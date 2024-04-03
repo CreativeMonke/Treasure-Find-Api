@@ -29,17 +29,25 @@ export async function createLocation(req, res) {
 
 export async function editLocation(req, res) {
     const updates = req.body;
+    const {id} = req.params;
+    const location = await Location.findById(req.params.id);
+    if (!location) {
+      return res.status(404).json({
+        status: 'failed',
+        message: 'Location not found'
+      });
+    }
     
     try {
       // Update the location using the location object attached by the locateMiddleware
-      Object.assign(req.location, updates);
+      Object.assign(location, updates);
   
-      await req.location.save();
+      await location.save();
   
       res.status(200).json({
         status: "success",
-        data: req.location,
-        message: "Location updated successfully!"
+        data: location,
+        message: "Location updated successfully!",
       });
     } catch (err) {
       res.status(500).json({
