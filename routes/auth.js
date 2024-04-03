@@ -34,7 +34,7 @@ router.post(
   Register
 );
 
-router.get('/checkLoggedIn',Validate,checkLogin);
+router.get('/checkLoggedIn',Verify,checkLogin);
 router.post(
   "/login",
   check("email").isEmail().withMessage("Enter a valid email address").normalizeEmail(),
