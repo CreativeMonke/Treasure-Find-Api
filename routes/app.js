@@ -17,6 +17,7 @@ app.get("/", (req, res) => {
     } catch (err) {
         res.status(500).json({
             status: "error",
+            data: [err],
             message: "Internal Server Error",
         });
     }

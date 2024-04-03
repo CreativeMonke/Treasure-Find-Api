@@ -58,7 +58,7 @@ export async function VerifyRole(req, res, next) {
         return res.status(500).json({
             status: "failed",
             code: 500,
-            data: [],
+            data: [err],
             message: "Internal Server Error",
         });
     }
