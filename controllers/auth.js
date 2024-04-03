@@ -117,3 +117,19 @@ export async function Logout(req, res) {
     }
     res.end();
 }
+
+export async function checkLogin(req, res){
+    try {
+        res.status(200).json({
+            message: "Go for login",
+        });
+    } catch(err)
+    {
+        res.status(500).json({
+            status: "error",
+            data: {message: err},
+            message: "Internal Server Error",
+        });
+    }
+    res.end();
+}

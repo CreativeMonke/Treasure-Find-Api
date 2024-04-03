@@ -1,4 +1,4 @@
-import { Login, Register } from "../controllers/auth.js";
+import { Login, Register , checkLogin } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check, validationResult } from "express-validator";
 import express from "express";
@@ -34,6 +34,7 @@ router.post(
   Register
 );
 
+router.get('/checkLoggedIn',Validate,checkLogin);
 router.post(
   "/login",
   check("email").isEmail().withMessage("Enter a valid email address").normalizeEmail(),

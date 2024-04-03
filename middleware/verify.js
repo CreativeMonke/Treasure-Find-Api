@@ -6,16 +6,24 @@ import Blacklist from "../models/Blacklist.js";
 export async function Verify(req, res, next) {
     try {
         const authHeader = req.headers["cookie"];
-        if (!authHeader) return res.sendStatus(401);
+        if (!authHeader) return res.Status(403).json({
+            status: "failed",
+            data: [],
+            message: "No auth token found",
+        });
         const cookie = authHeader.split("=")[1];
         const accessToken = cookie.split(";")[0];
         const checkIfBlacklisted = await Blacklist.findOne({ token: accessToken });
         if (checkIfBlacklisted)
-            return res.status(401).json({ message: "This session has expired. Please login" });
+            return res.status(401).json({
+                status: "invalid",
+                message: "This session has expired. Please login"
+            });
         ///Daca exista, mentine doar jwt-ul
         jwt.verify(accessToken, SECRET_ACCES_TOKEN, async (err, decoded) => {
             if (err)
                 return res.status(401).json({
+                    status: "invalid",
                     message: "This session has expired. Please log in!",
                 });
 
@@ -29,7 +37,7 @@ export async function Verify(req, res, next) {
         res.status(500).json({
             status: "error",
             code: 500,
-            data: [],
+            data: [err],
             message: "Internal Server Error",
         });
     }
