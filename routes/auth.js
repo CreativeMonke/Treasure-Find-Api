@@ -29,7 +29,7 @@ router.post(
     .notEmpty()
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 chars long"),
-  check("towm").notEmpty().withMessage("Town required!"),
+  check("town").notEmpty().withMessage("Town required!"),
   Validate,
   Register
 );

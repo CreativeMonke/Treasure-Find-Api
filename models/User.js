@@ -33,8 +33,10 @@ const UserSchema = new mongoose.Schema(
         },
         town: {
             type: String,
-            required: false,
+            required: "Your town is required",
             max: 20,
+            lowercase: true,
+            trim: true,
         },
         team: {
             type: String,
