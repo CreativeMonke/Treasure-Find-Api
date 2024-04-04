@@ -1,4 +1,4 @@
-import { Login, Register , checkLogin } from "../controllers/auth.js";
+import { Login, Register, checkLogin } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check, validationResult } from "express-validator";
 import express from "express";
@@ -34,7 +34,7 @@ router.post(
   Register
 );
 
-router.get('/checkLoggedIn',Verify,checkLogin);
+router.get('/checkLoggedIn', Verify, checkLogin);
 router.post(
   "/login",
   check("email").isEmail().withMessage("Enter a valid email address").normalizeEmail(),
@@ -45,23 +45,23 @@ router.post(
 router.put(
   "/user/edit",
   check('first_name')
-      .optional()
-      .trim()
-      .escape()
-      .isLength({ min: 2, max: 25 })
-      .withMessage('Your first name must be between 2 and 25 characters.'),
-    check('last_name')
-      .optional()
-      .trim()
-      .escape()
-      .isLength({ min: 2, max: 25 })
-      .withMessage('Your last name must be between 2 and 25 characters.'),
-    check('town')
-      .optional()
-      .trim()
-      .escape()
-      .isLength({ min: 2, max: 20 })
-      .withMessage('Your town must be between 2 and 20 characters.'),
+    .optional()
+    .trim()
+    .escape()
+    .isLength({ min: 2, max: 25 })
+    .withMessage('Your first name must be between 2 and 25 characters.'),
+  check('last_name')
+    .optional()
+    .trim()
+    .escape()
+    .isLength({ min: 2, max: 25 })
+    .withMessage('Your last name must be between 2 and 25 characters.'),
+  check('town')
+    .optional()
+    .trim()
+    .escape()
+    .isLength({ min: 2, max: 20 })
+    .withMessage('Your town must be between 2 and 20 characters.'),
   Verify,
   validateUpdate,
   updateUser,

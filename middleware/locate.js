@@ -1,16 +1,12 @@
 // middleware/locate.js
 
-import Location from '../models/Location.js';
-
 const locateMiddleware = async (req, res, next) => {
   try {
-    // If the location exists, attach it to the request object so
-    // it can be accessed in the subsequent controller without having to query again.
     next();
   } catch (error) {
-    // If there's an error in searching for the location, such as an invalid ID format:
     res.status(500).json({
       status: 'error',
+      data: error,
       message: 'Error checking for location'
     });
   }

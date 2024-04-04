@@ -6,7 +6,7 @@ import Blacklist from "../models/Blacklist.js";
 export async function Verify(req, res, next) {
     try {
         const authHeader = req.headers["cookie"];
-        if (!authHeader) return res.Status(403).json({
+        if (!authHeader) return res.status(403).json({
             status: "failed",
             data: [],
             message: "No auth token found",
@@ -34,6 +34,7 @@ export async function Verify(req, res, next) {
             next();
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             status: "error",
             code: 500,

@@ -22,7 +22,6 @@ const LocationSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  // Separate fields for latitude and longitude
   lat: {
     type: Number,
     required: true

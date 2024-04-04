@@ -3,8 +3,10 @@ import Auth from "./auth.js"
 import { Verify, VerifyRole } from "../middleware/verify.js";
 import { Logout } from "../controllers/auth.js";
 import locationRoutes from "./locationsRoutes.js"
+import Answers from "./answers.js"
 const app = express(); // Create an app object
 app.use("/auth",Auth);
+app.use("/answer",Answers);
 app.disable("x-powered-by"); // Reduce fingerprinting (optional)
 // home route with the get method and a handler
 app.get("/", (req, res) => {
