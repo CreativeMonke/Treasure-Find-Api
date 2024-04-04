@@ -1,12 +1,12 @@
 import Location from "../../models/Location.js";
 
 export async function createLocation(req, res) {
-    const { name, picture, question, answer, lat, lng } = req.body;
+    const { name, imgSrc, question, answer, lat, lng } = req.body;
 
     try {
         const location = new Location({
             name,
-            picture,
+            imgSrc,
             question,
             answer,
             lat,

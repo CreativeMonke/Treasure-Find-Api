@@ -7,7 +7,7 @@ const LocationSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  picture: {
+  imgSrc: {
     type: String,
     required: true,
     trim: true

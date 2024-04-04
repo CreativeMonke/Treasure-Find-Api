@@ -120,6 +120,8 @@ export async function Logout(req, res) {
 
 export async function checkLogin(req, res) {
     try {
+        const authHeader = req.headers["cookie"];
+        console.log(authHeader);
         res.status(200).json({
             message: "Go for login",
         });
