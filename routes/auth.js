@@ -42,30 +42,5 @@ router.post(
   Validate,
   Login,
 );
-router.put(
-  "/user/edit",
-  check('first_name')
-    .optional()
-    .trim()
-    .escape()
-    .isLength({ min: 2, max: 25 })
-    .withMessage('Your first name must be between 2 and 25 characters.'),
-  check('last_name')
-    .optional()
-    .trim()
-    .escape()
-    .isLength({ min: 2, max: 25 })
-    .withMessage('Your last name must be between 2 and 25 characters.'),
-  check('town')
-    .optional()
-    .trim()
-    .escape()
-    .isLength({ min: 2, max: 20 })
-    .withMessage('Your town must be between 2 and 20 characters.'),
-  Verify,
-  validateUpdate,
-  updateUser,
-)
 
-router.get("/users/getAll",Verify,VerifyRole,getAllUsers);
 export default router;

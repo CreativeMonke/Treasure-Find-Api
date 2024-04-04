@@ -1,29 +1,29 @@
 import User from "../models/User.js"
 import jwt from "jsonwebtoken";
 import { SECRET_ACCES_TOKEN } from "../config/index.js";
-export async function updateUser(req,res){
-    try{
+export async function updateUser(req, res) {
+    try {
         const token = req.cookies.SessionID;
-        if(!token){
+        if (!token) {
             return res.status(401).json({
-                status:"failed",
-                message:"Please log in!",
+                status: "failed",
+                message: "Please log in!",
             });
         }
 
-        const decoded = jwt.verify(token,SECRET_ACCES_TOKEN);
-        console.log("id = "+ decoded.id);
+        const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
+        console.log("id = " + decoded.id);
         const userId = decoded.id;
         const updates = req.body;
 
-        const allowedUpdates = ["first_name", "last_name", "team","town"];
+        const allowedUpdates = ["first_name", "last_name", "team", "town"];
         const actualUpdates = Object.keys(updates).filter(key => allowedUpdates.includes(key));
 
         const user = await User.findById(userId);
 
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                status:"failed",
+                status: "failed",
                 message: "User not found!",
             });
         }
@@ -34,22 +34,54 @@ export async function updateUser(req,res){
 
         await user.save();
 
-        const {password, ...updatedUserData} = user._doc;
+        const { password, ...updatedUserData } = user._doc;
 
         res.status(200).json({
-            status:"succes",
+            status: "succes",
             data: updatedUserData,
             message: "User data changed succesfully!",
         });
-    }catch(err){
+    } catch (err) {
         console.error(err);
         res.status(500).json({
-            status:"error",
-            message:"Internal Server Error",
+            status: "error",
+            message: "Internal Server Error",
         });
     }
     res.end();
 
+}
+
+export async function editUserById(req, res) {
+    try {
+        const { userId } = req.params;
+        const updates = req.body;
+        const allowedUpdates = ["first_name", "last_name", "team", "town", "role"];
+        const actualUpdates = Object.keys(updates).filter(key => allowedUpdates.includes(key));
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                status: "failed",
+                message: "User not found!",
+            });
+        }
+        actualUpdates.forEach((update) => {
+            user[update] = updates[update];
+        });
+        await user.save();
+        const { password, ...updatedUserData } = user._doc;
+        res.status(200).json({
+            status: "succes",
+            data: updatedUserData,
+            message: "User data changed succesfully!",
+        });
+    }catch(evt){
+        console.error(evt);
+        res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
+    }
 }
 
 export async function getAllUsers(req, res) {
