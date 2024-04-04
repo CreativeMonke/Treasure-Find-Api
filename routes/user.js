@@ -30,24 +30,6 @@ router.put(
 )
 router.put(
     "/edit/:userId",
-    check('first_name')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 2, max: 25 })
-        .withMessage('The name must be between 2 and 25 characters.'),
-    check('last_name')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 2, max: 25 })
-        .withMessage('The name must be between 2 and 25 characters.'),
-    check('town')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 2, max: 20 })
-        .withMessage('The town name must be between 2 and 20 characters.'),
     Verify,
     VerifyRole,
     validateUpdate,
