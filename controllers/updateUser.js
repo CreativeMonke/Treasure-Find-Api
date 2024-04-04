@@ -51,3 +51,23 @@ export async function updateUser(req,res){
     res.end();
 
 }
+
+export async function getAllUsers(req, res) {
+    try {
+        const users = await User.find();
+        ///omit password field
+        const usersData = users.map((user) => user._doc);
+        res.status(200).json({
+            status: "success",
+            data: usersData,
+            message: "Users fetched successfully!",
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
+    }
+    res.end();
+}

@@ -2,8 +2,8 @@ import { Login, Register, checkLogin } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check, validationResult } from "express-validator";
 import express from "express";
-import { Verify } from "../middleware/verify.js";
-import { updateUser } from "../controllers/updateUser.js";
+import { Verify , VerifyRole } from "../middleware/verify.js";
+import { getAllUsers, updateUser } from "../controllers/updateUser.js";
 import { validateUpdate } from "../middleware/update.js";
 const router = express.Router();
 
@@ -66,4 +66,6 @@ router.put(
   validateUpdate,
   updateUser,
 )
+
+router.get("/users/getAll",Verify,VerifyRole,getAllUsers);
 export default router;
