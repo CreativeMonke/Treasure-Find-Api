@@ -5,22 +5,19 @@ import Blacklist from "../models/Blacklist.js";
 
 export async function Verify(req, res, next) {
     try {
-        const authHeader = req.headers["cookie"];
-        if (!authHeader) return res.status(403).json({
+        const sessionId = req.body.sessionId;
+        if (!sessionId) return res.status(403).json({
             status: "failed",
-            data: [],
             message: "No auth token found",
         });
-        const cookie = authHeader.split("=")[1];
-        const accessToken = cookie.split(";")[0];
-        const checkIfBlacklisted = await Blacklist.findOne({ token: accessToken });
+        const checkIfBlacklisted = await Blacklist.findOne({ token: sessionId });
         if (checkIfBlacklisted)
             return res.status(401).json({
                 status: "invalid",
                 message: "This session has expired. Please login"
             });
         ///Daca exista, mentine doar jwt-ul
-        jwt.verify(accessToken, SECRET_ACCES_TOKEN, async (err, decoded) => {
+        jwt.verify(sessionId, SECRET_ACCES_TOKEN, async (err, decoded) => {
             if (err)
                 return res.status(401).json({
                     status: "invalid",
