@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 export async function submitAnswer(req, res) {
     try {
         const { question, answer, locationId } = req.body;
-        const token = req.cookies.SessionID;
+        const token = req.headers.sessionid;
         if (!token) {
             return res.status(401).json({
                 status: "failed",

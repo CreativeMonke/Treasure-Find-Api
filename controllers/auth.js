@@ -70,7 +70,7 @@ export async function Register(req, res) {
             });
         const savedUser = await newUser.save();
         const { role, ...user_data } = savedUser._doc;
-        console.log(savedUser);
+        //console.log(savedUser);
         res.status(200).json({
             status: "success",
             user: [user_data],
@@ -91,7 +91,7 @@ export async function Register(req, res) {
 
 export async function Logout(req, res) {
     try {
-        const sessionId = req.body.sessionId;
+        const sessionId = req.headers.sessionid;
         if (!sessionId)
             return res.sendStatus(204);
         const checkIfBlacklist = await Blacklist.findOne({ token: sessionId });
@@ -118,8 +118,8 @@ export async function Logout(req, res) {
 
 export async function checkLogin(req, res) {
     try {
-        const sessionId = req.body.sessionId;
-        console.log(sessionId);
+        const sessionId = req.headers.sessionid;
+        //console.log(sessionId);
         res.status(200).json({
             message: "Go for login",
         });

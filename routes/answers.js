@@ -31,6 +31,6 @@ router.get("/getAnswersByUserId", Verify, VerifyRole, getAnswersByUserId);
 
 //update the answer validity
 
-router.put("/updateAnswerValidity/:answerId", Verify, VerifyRole, updateAnswerValidity);
+router.post("/updateAnswerValidity/:answerId", Verify, VerifyRole, updateAnswerValidity);
 
 export default router;
