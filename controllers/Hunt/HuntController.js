@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { poiDb, userDb } from '../../config/databaseConfig.js';
 
 // Directly deriving the directory path of the current module
 const currentDir = dirname(fileURLToPath(import.meta.url));
@@ -22,10 +23,15 @@ async function initConfigFile() {
 initConfigFile();
 
 // Function to get the current globalOptions
+
 export async function getHuntOptions(req, res) {
     try {
-        const data = await fs.readFile(configPath, 'utf8');
-        res.json(JSON.parse(data));
+        let data = await fs.readFile(configPath, 'utf8');
+        data = JSON.parse(data);
+        const nrOfSignedUpUsers = await userDb.collection('user_infos').countDocuments();
+        const nrOfObjectives = await poiDb.collection('locations').countDocuments();
+        res.json({ startTime: data.startTime, endTime: data.endTime, nrOfSignedUpUsers, nrOfObjectives });
+        res.nrOfUsers = userDb.collection('user_infos').countDocuments();
     } catch (error) {
         console.error('Failed to read the hunt options:', error);
         res.status(500).send('Error fetching hunt options');
