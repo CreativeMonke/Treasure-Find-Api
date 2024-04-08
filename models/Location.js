@@ -22,6 +22,10 @@ const LocationSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  radius:{
+    type: Number,
+    default:130,
+  },
   lat: {
     type: Number,
     required: true

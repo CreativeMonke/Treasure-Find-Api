@@ -24,6 +24,10 @@ const answerSchema = new mongoose.Schema({
         default: false,
         required: true
     },
+    hasBeenUpdated:{
+        type: Boolean,
+        default: false,
+    },
 
 }, { timestamps: true });
 

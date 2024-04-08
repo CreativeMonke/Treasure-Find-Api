@@ -31,7 +31,7 @@ export async function createLocation(req, res) {
 export async function editLocation(req, res) {
     const updates = req.body;
     const {id} = req.params;
-    const location = await Location.findById(req.params.id);
+    const location = await Location.findById(id);
     if (!location) {
       return res.status(404).json({
         status: 'failed',
