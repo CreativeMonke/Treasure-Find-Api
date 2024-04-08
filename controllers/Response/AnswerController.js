@@ -2,18 +2,14 @@ import { SECRET_ACCES_TOKEN } from "../../config/index.js";
 import Answer from "../../models/Response.js"
 import Location from "../../models/Location.js";
 import jwt from "jsonwebtoken";
+import { evaluateResponse } from "./AiCheck.js";
 export async function submitAnswer(req, res) {
     try {
         const { question, answer, locationId } = req.body;
         const token = req.headers.sessionid;
         const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
         const userId = decoded.id;
-        const newAnswer = new Answer({
-            question: question,
-            answer: answer,
-            userId: userId,
-            locationId: locationId,
-        });
+
         ///Check to see if the user already responded
         const existingAnswer = await Answer.findOne({
             userId: userId,
@@ -33,6 +29,13 @@ export async function submitAnswer(req, res) {
                 message: "Location not found!",
             });
         }
+        const newAnswer = new Answer({
+            question: question,
+            answer: answer,
+            correctAnswer: location.answer,
+            userId: userId,
+            locationId: locationId,
+        });
         const savedAnswer = await newAnswer.save();
         return res.status(200).json({
             status: "success",
@@ -149,14 +152,6 @@ export async function updateAnswerById(req, res) {
         });
     }
     try {
-        ///Check if the answer has been modified
-        /* if (answer.answer != "Waiting for user answer") {
-             return res.status(409).json({
-                 status: "failed",
-                 message: "Answer has already been modified!",
-             });
-         }
-         */
         if (answer.hasBeenUpdated) {
             return res.status(409).json({
                 status: "failed",
@@ -164,7 +159,7 @@ export async function updateAnswerById(req, res) {
             });
         }
         else
-        answer.hasBeenUpdated = true;
+            answer.hasBeenUpdated = true;
         const age = answerAge(answer);
         if (age > 5 * 60) // 5 minutes
 
@@ -176,13 +171,19 @@ export async function updateAnswerById(req, res) {
         actualUpdated.forEach((key) => {
             answer[key] = updates[key];
         });
-
         await answer.save();
         res.status(200).json({
             status: "success",
             data: answer,
             message: "Answer updated successfully!",
         });
+        ///Create a new entry in correct Answers for each `;` you find
+        const correctAnswers  = answer.correctAnswer.split(`;`);
+        //console.log(correctAnswers);
+        answer.evaluationScore = await evaluateResponse(answer.answer, correctAnswers);
+        await answer.save();
+
+
     } catch (err) {
         console.error(err);
         res.status(500).json({

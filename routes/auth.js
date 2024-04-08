@@ -1,8 +1,8 @@
-import { Login, Register, checkLogin } from "../controllers/auth.js";
+import { Login, Register, checkLogin, Logout } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
-import { check, validationResult } from "express-validator";
+import { check } from "express-validator";
 import express from "express";
-import { Verify , VerifyRole } from "../middleware/verify.js";
+import { Verify, VerifyRole } from "../middleware/verify.js";
 import { getAllUsers, updateUser } from "../controllers/updateUser.js";
 import { validateUpdate } from "../middleware/update.js";
 const router = express.Router();
@@ -42,5 +42,6 @@ router.post(
   Validate,
   Login,
 );
+router.get("/logout", Verify, Logout);
 
 export default router;

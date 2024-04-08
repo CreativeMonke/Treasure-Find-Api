@@ -23,14 +23,13 @@ export async function Login(req, res) {
             });
 
         let options = {
-            maxAge: 60 * 60 * 1000,
+            maxAge: 5 * 60 * 60 * 1000,
             httpOnly: true,
             secure: true,
             sameSite: "None",
         };
 
         const token = user.generateAccessJWT();
-        //res.cookie("SessionID", token, options);
 
         const { password, ...user_data } = user._doc;
         return res.status(200).json({

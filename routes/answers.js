@@ -19,7 +19,7 @@ router.post("/submit",
         .withMessage("Please enter a valid answer answer")
         .isLength({ min: 5, max: 200 })
         .withMessage("The answer must be between 5 and 200 characters"),
-    Verify, VerifyRole, submitAnswer);
+    Verify, submitAnswer);
 
 //get the answers by location id
 
@@ -27,7 +27,7 @@ router.get("/getAnswersByLocationId/:locationId", Verify, VerifyRole, getAnswers
 
 //get the answers by user id
 
-router.get("/getAnswersByUserId", Verify, VerifyRole, getAnswersByUserId);
+router.get("/getAnswersByUserId", Verify, getAnswersByUserId);
 
 //update the answer validity
 

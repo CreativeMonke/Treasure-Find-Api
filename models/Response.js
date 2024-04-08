@@ -7,6 +7,10 @@ const answerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    correctAnswer: {
+        type: String,
+        required: true
+    },
     answer: {
         type: String,
         required: true
@@ -19,10 +23,9 @@ const answerSchema = new mongoose.Schema({
         type: ObjectId,
         required: true
     },
-    isValid: {
-        type: Boolean,
-        default: false,
-        required: true
+    evaluationScore: {
+        type: Number,
+        default: 0,
     },
     hasBeenUpdated:{
         type: Boolean,
