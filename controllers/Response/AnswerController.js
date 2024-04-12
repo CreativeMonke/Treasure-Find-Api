@@ -73,15 +73,7 @@ export async function getAnswersByLocationId(req, res) {
 
 export async function getAnswersByUserId(req, res) {
     try {
-        const token = req.headers.sessionid;
-        if (!token) {
-            return res.status(401).json({
-                status: "failed",
-                message: "Please log in!",
-            });
-        }
-        const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
-        const userId = decoded.id;
+        const userId = req.user._id;
         const answers = await Answer.find({ userId: userId });
         return res.status(200).json({
             status: "success",
@@ -99,12 +91,10 @@ export async function getAnswersByUserId(req, res) {
 export async function getAnswer(req, res) {
     try {
         const { locationId } = req.params;
-        const token = req.headers.sessionid;
-        const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
-        const userId = decoded.id;
+        const userId = req.user._id;
 
         const updates = req.body;
-        console.log(updates);
+        //console.log(updates);
         const allowedUpdated = ["answer", "isValid"];
         const answer = await Answer.findOne({ locationId: locationId, userId: userId });
         if (!answer) {
@@ -178,7 +168,8 @@ export async function updateAnswerById(req, res) {
             message: "Answer updated successfully!",
         });
         ///Create a new entry in correct Answers for each `;` you find
-        const correctAnswers  = answer.correctAnswer.split(`;`);
+        const correctAnswers = answer.correctAnswer.split(`;`);
+
         //console.log(correctAnswers);
         answer.evaluationScore = await evaluateResponse(answer.answer, correctAnswers);
         await answer.save();

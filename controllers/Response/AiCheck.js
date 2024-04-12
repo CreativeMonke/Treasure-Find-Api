@@ -4,7 +4,6 @@ import { sentenceSimilarity } from "@huggingface/inference";
 ///Integration with huggingface to check the similarity of the userResponse to the correct response
 
 export async function evaluateResponse(userResponse, correctResponses) {
-
     const hf = new HfInference(HUGGING_FACE_TOKEN);
     try {
         const modelId = "BAAI/bge-m3";
