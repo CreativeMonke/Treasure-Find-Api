@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { SECRET_ACCES_TOKEN } from "../config/index.js";
 export async function updateUser(req, res) {
     try {
-        const token = req.cookies.SessionID;
+        const token = req.headers.sessionid;
         if (!token) {
             return res.status(401).json({
                 status: "failed",
@@ -12,7 +12,7 @@ export async function updateUser(req, res) {
         }
 
         const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
-        console.log("id = " + decoded.id);
+        //console.log("id = " + decoded.id);
         const userId = decoded.id;
         const updates = req.body;
 
@@ -51,12 +51,31 @@ export async function updateUser(req, res) {
     res.end();
 
 }
+export async function startHunt(req,res){
+    try {
+        const user = await User.findById(req.user._id);
+        console.log(user);
+        user.hasStartedHunt = true;
+        console.log(user);
+        await user.save();
+        res.status(200).json({
+            status: "succes",
+            message: "Hunt started succesfully!",
+        });
 
+    } catch(err){
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
+    }
+}
 export async function editUserById(req, res) {
     try {
         const { userId } = req.params;
         const updates = req.body;
-        const allowedUpdates = ["first_name", "last_name", "team", "town", "role"];
+        const allowedUpdates = ["first_name", "last_name", "town", "role"];
         const actualUpdates = Object.keys(updates).filter(key => allowedUpdates.includes(key));
         const user = await User.findById(userId);
         if (!user) {
@@ -103,3 +122,4 @@ export async function getAllUsers(req, res) {
     }
     res.end();
 }
+

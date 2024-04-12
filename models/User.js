@@ -37,9 +37,10 @@ const UserSchema = new mongoose.Schema(
             lowercase: true,
             trim: true,
         },
-        team: {
-            type: String,
-            default: "default",
+        hasStartedHunt: {
+            type: Boolean,
+            default: false,
+            timestamps: true,
         },
         role: {
             type: String,

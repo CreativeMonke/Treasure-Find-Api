@@ -118,7 +118,6 @@ export async function Logout(req, res) {
 export async function checkLogin(req, res) {
     try {
         const sessionId = req.headers.sessionid;
-        //console.log(sessionId);
         res.status(200).json({
             message: "Go for login",
         });

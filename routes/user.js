@@ -1,7 +1,7 @@
 import { check } from "express-validator";
 import express from "express";
 import { Verify, VerifyRole } from "../middleware/verify.js";
-import { getAllUsers, updateUser , editUserById} from "../controllers/updateUser.js";
+import { getAllUsers, updateUser , editUserById, startHunt} from "../controllers/updateUser.js";
 import { validateUpdate } from "../middleware/update.js";
 const router = express.Router();
 router.put(
@@ -36,5 +36,5 @@ router.put(
     editUserById,
 )
 router.get("/getAll", Verify, VerifyRole, getAllUsers);
-
+router.get("/startHunt", Verify, startHunt);
 export default router;

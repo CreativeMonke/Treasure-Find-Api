@@ -5,8 +5,8 @@ import Blacklist from "../models/Blacklist.js";
 
 export async function Verify(req, res, next) {
     try {
-        const accessToken = req.headers["sessionid"];
-        console.log(accessToken);
+        const accessToken = req.headers.sessionid;
+        //console.log(accessToken);
         if (!accessToken) return res.status(403).json({
             status: "failed",
             data: [],
@@ -25,7 +25,7 @@ export async function Verify(req, res, next) {
                     status: "invalid",
                     message: "This session has expired. Please log in!",
                 });
-                console.log(decoded);
+               // console.log(decoded);
             const { id } = decoded;
             const user = await User.findById(id);
             const { password, ...data } = user._doc;
