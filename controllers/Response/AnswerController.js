@@ -6,9 +6,8 @@ import { evaluateResponse } from "./AiCheck.js";
 export async function submitAnswer(req, res) {
     try {
         const { question, answer, locationId } = req.body;
-        const token = req.headers.sessionid;
-        const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
-        const userId = decoded.id;
+        const userId = req.user._id;
+
 
         ///Check to see if the user already responded
         const existingAnswer = await Answer.findOne({

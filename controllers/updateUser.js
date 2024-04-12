@@ -3,17 +3,7 @@ import jwt from "jsonwebtoken";
 import { SECRET_ACCES_TOKEN } from "../config/index.js";
 export async function updateUser(req, res) {
     try {
-        const token = req.headers.sessionid;
-        if (!token) {
-            return res.status(401).json({
-                status: "failed",
-                message: "Please log in!",
-            });
-        }
-
-        const decoded = jwt.verify(token, SECRET_ACCES_TOKEN);
-        //console.log("id = " + decoded.id);
-        const userId = decoded.id;
+        const userId = req.user._id;
         const updates = req.body;
 
         const allowedUpdates = ["first_name", "last_name", "team", "town"];
