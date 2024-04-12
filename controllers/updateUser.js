@@ -54,9 +54,7 @@ export async function updateUser(req, res) {
 export async function startHunt(req,res){
     try {
         const user = await User.findById(req.user._id);
-        console.log(user);
         user.hasStartedHunt = true;
-        console.log(user);
         await user.save();
         res.status(200).json({
             status: "succes",
