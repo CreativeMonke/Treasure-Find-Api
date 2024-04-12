@@ -51,17 +51,35 @@ export async function updateUser(req, res) {
     res.end();
 
 }
-export async function startHunt(req,res){
+export async function startHunt(req, res) {
     try {
         const user = await User.findById(req.user._id);
-        user.hasStartedHunt = true;
+        user.huntState.hasStartedHunt = true;
         await user.save();
         res.status(200).json({
             status: "succes",
             message: "Hunt started succesfully!",
         });
 
-    } catch(err){
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
+    }
+}
+export async function endHunt(req, res) {
+    try {
+        const user = await User.findById(req.user._id);
+        user.huntState.hasEndedHunt = true;
+        await user.save();
+        res.status(200).json({
+            status: "succes",
+            message: "Hunt ended!",
+        });
+
+    } catch (err) {
         console.error(err);
         res.status(500).json({
             status: "error",
@@ -92,7 +110,7 @@ export async function editUserById(req, res) {
             data: updatedUserData,
             message: "User data changed succesfully!",
         });
-    }catch(evt){
+    } catch (evt) {
         console.error(evt);
         res.status(500).json({
             status: "error",

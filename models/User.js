@@ -37,10 +37,17 @@ const UserSchema = new mongoose.Schema(
             lowercase: true,
             trim: true,
         },
-        hasStartedHunt: {
-            type: Boolean,
-            default: false,
-            timestamps: true,
+        huntState: {
+            hasStartedHunt: {
+                type: Boolean,
+                default: false,
+                timestamps: true,
+            },
+            hasEndedHunt: {
+                type: Boolean,
+                default: false,
+                timestamps: true,
+            }
         },
         role: {
             type: String,

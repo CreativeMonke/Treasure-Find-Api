@@ -28,6 +28,11 @@ export async function Verify(req, res, next) {
                // console.log(decoded);
             const { id } = decoded;
             const user = await User.findById(id);
+            if(!user)
+            return res.status(401).json({
+                status: "invalid",
+                message: "This session has expired. Please log in!",
+            });
             const { password, ...data } = user._doc;
             req.user = data;
             next();
