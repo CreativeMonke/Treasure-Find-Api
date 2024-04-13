@@ -25,7 +25,7 @@ const answerSchema = new mongoose.Schema({
     },
     evaluationScore: {
         type: Number,
-        default: 0,
+        default: -1,
     },
     hasBeenUpdated:{
         type: Boolean,
