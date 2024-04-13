@@ -3,6 +3,9 @@ import Answer from "../../models/Response.js"
 import Location from "../../models/Location.js";
 import jwt from "jsonwebtoken";
 import { evaluateResponse } from "./AiCheck.js";
+import { getHuntStartStatus } from "../Hunt/HuntController.js";
+import { configManager } from "../GlobalSettingsModule/configManager.js";
+
 export async function submitAnswer(req, res) {
     try {
         const { question, answer, locationId } = req.body;
@@ -69,24 +72,38 @@ export async function getAnswersByLocationId(req, res) {
 }
 
 
-
 export async function getAnswersByUserId(req, res) {
     try {
+        // await configManager.loadConfig(); // Ensure config is loaded
+
+        const huntStatus = await getHuntStartStatus();
+        const config = configManager.getConfig();
+        // Default projection excludes sensitive data
+        let excludes = { correctAnswer: 0, evaluationScore: 0 };
+
+        // Check if the hunt has ended and if answers are ready to be shown
+        if (huntStatus === 'ended' && config.answersReady) {
+            // Include the sensitive data if conditions are met
+            excludes = {}; // Removing the projection limitations
+        }
+
         const userId = req.user._id;
-        const answers = await Answer.find({ userId: userId });
+        const answers = await Answer.find({ userId: userId }, excludes);
+
         return res.status(200).json({
             status: "success",
             data: answers,
         });
     } catch (err) {
-        console.log(err);
+        console.error('Error fetching user answers:', err);
         return res.status(500).json({
             status: "error",
-            data: [err],
+            data: [err.message],
             message: "Internal Server Error",
         });
     }
 }
+
 export async function getAnswer(req, res) {
     try {
         const { locationId } = req.params;
