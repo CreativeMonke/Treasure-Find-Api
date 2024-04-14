@@ -27,6 +27,10 @@ const answerSchema = new mongoose.Schema({
         type: Number,
         default: -1,
     },
+    isCorrectFinalEvaluation:{
+        type: Boolean,
+        default: false,
+    },
     hasBeenUpdated:{
         type: Boolean,
         default: false,

@@ -103,7 +103,31 @@ export async function getAnswersByUserId(req, res) {
         });
     }
 }
-
+export async function getNumberOfCorrectAnswers(req, res) {
+    try {
+        const userId = req.user._id;
+        const answers = await Answer.find({ userId: userId });
+        let count = 0;
+        answers.forEach((answer) => {
+            console.log(answer);
+            if (answer.isCorrectFinalEvaluation) {
+                count++;
+            }
+        })
+        return res.status(200).json({
+            status: "success",
+            numberOfCorrectAnswers: count,
+            numberOfAnswers : answers.length
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            status: "error",
+            data: [err],
+            message: "Internal Server Error",
+        });
+    }
+}
 export async function getAnswer(req, res) {
     try {
         const { locationId } = req.params;
@@ -188,6 +212,8 @@ export async function updateAnswerById(req, res) {
 
         //console.log(correctAnswers);
         answer.evaluationScore = await evaluateResponse(answer.answer, correctAnswers);
+        if (answer.evaluationScore >= 70)
+            answer.isCorrectFinalEvaluation = true;
         await answer.save();
 
 
@@ -200,6 +226,7 @@ export async function updateAnswerById(req, res) {
         });
     }
 }
+
 export async function updateAnswerValidity(req, res) {
     try {
         const { answerID } = req.params;
@@ -220,7 +247,3 @@ export async function updateAnswerValidity(req, res) {
     }
 }
 
-export async function csvAllData(res,req)
-{
-    
-}
