@@ -44,5 +44,5 @@ router.get("/getAnswer/:locationId", Verify, getAnswer);
 
 router.get("/getAllAnswers", Verify, VerifyRole, csvAllData);
 
-router.get("/getNumberOfCorrectAnswers" , Verify , getNumberOfCorrectAnswers);
+router.get("/getNumberOfCorrectAnswers", Verify, getNumberOfCorrectAnswers);
 export default router;
