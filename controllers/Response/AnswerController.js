@@ -109,7 +109,6 @@ export async function getNumberOfCorrectAnswers(req, res) {
         const answers = await Answer.find({ userId: userId });
         let count = 0;
         answers.forEach((answer) => {
-            console.log(answer);
             if (answer.isCorrectFinalEvaluation) {
                 count++;
             }
