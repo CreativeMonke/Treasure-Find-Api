@@ -34,8 +34,6 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: "Your town is required",
             max: 20,
-            lowercase: true,
-            trim: true,
         },
         huntState: {
             hasStartedHunt: {

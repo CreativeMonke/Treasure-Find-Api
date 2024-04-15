@@ -32,12 +32,23 @@ router.post(
   Validate,
   Register
 );
-router.post("/verifyEmail", VerifyEmail);
+router.post("/verifyEmail",
+  check("email")
+    .isEmail()
+    .withMessage("Enter a valid email address")
+    .normalizeEmail(),
+  Validate,
+  VerifyEmail);
 router.get('/checkLoggedIn', Verify, checkLogin);
 router.post(
   "/login",
-  check("email").isEmail().withMessage("Enter a valid email address").normalizeEmail(),
-  check("password").not().isEmpty(),
+  check("email")
+    .isEmail()
+    .withMessage("Enter a valid email address")
+    .normalizeEmail(),
+  check("password")
+    .not()
+    .isEmpty(),
   Validate,
   Login,
 );
