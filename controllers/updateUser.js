@@ -81,7 +81,7 @@ export async function editUserById(req, res) {
     try {
         const { userId } = req.params;
         const updates = req.body;
-        const allowedUpdates = ["first_name", "last_name", "town", "role"];
+        const allowedUpdates = ["first_name", "last_name", "town", "role" , "password"];
         const actualUpdates = Object.keys(updates).filter(key => allowedUpdates.includes(key));
         const user = await User.findById(userId);
         if (!user) {

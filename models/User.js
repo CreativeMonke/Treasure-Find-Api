@@ -80,7 +80,7 @@ UserSchema.methods.generateAccessJWT = function () {
         id: this._id,
     };
     return jwt.sign(paylod, SECRET_ACCES_TOKEN, {
-        expiresIn: '60m',
+        expiresIn: '240m',
     });
 };
 

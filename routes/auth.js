@@ -1,10 +1,9 @@
-import { Login, Register, checkLogin, Logout } from "../controllers/auth.js";
+import { Login, Register, checkLogin, Logout, VerifyEmail } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check } from "express-validator";
 import express from "express";
-import { Verify, VerifyRole } from "../middleware/verify.js";
-import { getAllUsers, updateUser } from "../controllers/updateUser.js";
-import { validateUpdate } from "../middleware/update.js";
+import { Verify } from "../middleware/verify.js";
+
 const router = express.Router();
 
 router.post(
@@ -33,7 +32,7 @@ router.post(
   Validate,
   Register
 );
-
+router.post("/verifyEmail", VerifyEmail);
 router.get('/checkLoggedIn', Verify, checkLogin);
 router.post(
   "/login",

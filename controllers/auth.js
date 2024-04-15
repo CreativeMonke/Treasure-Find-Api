@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import Blacklist from "../models/Blacklist.js";
+import TemporaryRegistration from "../models/TempRegistration.js";
+import SendVerificationEmail  from "./VerifyEmail/verifyMail.js";
 export async function Login(req, res) {
     const { email } = req.body;
     try {
@@ -49,6 +51,81 @@ export async function Login(req, res) {
     res.end();
 }
 
+// routes/userRoutes.js (or wherever you manage routes)
+
+export async function Register(req, res) {
+    const { first_name, last_name, town, email, password } = req.body;
+    try {
+        const existingUser = await TemporaryRegistration.findOne({ email });
+        if (existingUser)
+            return res.status(409).json({
+                status: "failed",
+                message: "An account with that email is already in the process of being created!",
+            });
+
+        const newUser = new TemporaryRegistration({
+            first_name,
+            last_name,
+            town,
+            email,
+            password
+        });
+
+        await newUser.save();
+        await SendVerificationEmail(newUser);
+
+        res.status(200).json({
+            status: "success",
+            message: "Please check your email to verify your account.",
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: "error",
+            code: 500,
+            message: "Internal Server Error",
+        });
+    }
+}
+
+export async function VerifyEmail(req, res) {
+    const { email, verificationCode } = req.body;
+    try {
+        const tempUser = await TemporaryRegistration.findOne({ email, verificationCode });
+        if (!tempUser) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid verification code or email.",
+            });
+        }
+
+        const user = new User({
+            first_name: tempUser.first_name,
+            last_name: tempUser.last_name,
+            town: tempUser.town,
+            email: tempUser.email,
+            password: tempUser.password,
+            isEmailVerified: true
+        });
+
+        await user.save();
+        await TemporaryRegistration.deleteOne({ _id: tempUser._id });
+
+        res.status(200).json({
+            status: "success",
+            message: "Your email has been verified and your account has been created.",
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
+    }
+}
+
+
+/*
 export async function Register(req, res) {
     const { first_name, last_name, town, email, password } = req.body;
     try {
@@ -86,7 +163,8 @@ export async function Register(req, res) {
         });
     }
     res.end();
-}
+}*/
+
 
 export async function Logout(req, res) {
     try {
