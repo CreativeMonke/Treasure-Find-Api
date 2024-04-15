@@ -55,7 +55,6 @@ export async function Login(req, res) {
 
 export async function Register(req, res) {
     const { first_name, last_name, town, email, password } = req.body;
-    console.log(req.body);
     try {
         const existingUser = await TemporaryRegistration.findOne({ email });
         const existingUserInMain = await User.findOne({ email });
