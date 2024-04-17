@@ -68,7 +68,7 @@ export async function Register(req, res) {
                 status: "failed",
                 message: "An account with that email is already in the process of being created!",
             });
-        console.log(email);
+        //console.log(email);
         const newUser = new TemporaryRegistration({
             first_name,
             last_name,
@@ -76,7 +76,7 @@ export async function Register(req, res) {
             email,
             password
         });
-        console.log(newUser);
+        //console.log(newUser);
         await newUser.save();
         await SendVerificationEmail(newUser);
 
