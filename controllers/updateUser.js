@@ -10,7 +10,6 @@ export async function updateUser(req, res) {
         const actualUpdates = Object.keys(updates).filter(key => allowedUpdates.includes(key));
 
         const user = await User.findById(userId);
-
         if (!user) {
             return res.status(404).json({
                 status: "failed",
@@ -19,28 +18,31 @@ export async function updateUser(req, res) {
         }
 
         actualUpdates.forEach((update) => {
-            user[update] = updates[update];
+            if (user[update] !== undefined) { // Make sure the update property exists on the user
+                user[update] = updates[update];
+            } else {
+                throw new Error(`Attempt to update non-existing property: ${update}`);
+            }
         });
 
         await user.save();
 
         const { password, ...updatedUserData } = user._doc;
-
         res.status(200).json({
             status: "succes",
             data: updatedUserData,
             message: "User data changed succesfully!",
         });
     } catch (err) {
-        console.error(err);
+        console.error("Error updating user:", err.message);
         res.status(500).json({
             status: "error",
             message: "Internal Server Error",
         });
     }
     res.end();
-
 }
+
 export async function startHunt(req, res) {
     try {
         const user = await User.findById(req.user._id);
