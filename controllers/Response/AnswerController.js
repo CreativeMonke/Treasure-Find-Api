@@ -6,12 +6,21 @@ import { evaluateResponse } from "./AiCheck.js";
 import { getHuntStartStatus } from "../Hunt/HuntController.js";
 import { configManager } from "../GlobalSettingsModule/configManager.js";
 
+function isValidObjectId(id) {
+    return mongoose.Types.ObjectId.isValid(id);
+}
+
 export async function submitAnswer(req, res) {
     try {
         const { question, answer, locationId } = req.body;
         const userId = req.user._id;
 
-
+        if (!isValidObjectId(userId) || !isValidObjectId(locationId)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid user or location ID format.",
+            });
+        }
         ///Check to see if the user already responded
         const existingAnswer = await Answer.findOne({
             userId: userId,
@@ -57,6 +66,12 @@ export async function submitAnswer(req, res) {
 export async function getAnswersByLocationId(req, res) {
     try {
         const { locationId } = req.params;
+        if (!isValidObjectId(locationId)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid location ID format.",
+            });
+        }
         const answers = await Answer.find({ locationId: locationId });
         return res.status(200).json({
             status: "success",
@@ -88,6 +103,12 @@ export async function getAnswersByUserId(req, res) {
         }
 
         const userId = req.user._id;
+        if (!isValidObjectId(userId)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid user ID format.",
+            });
+        }
         const answers = await Answer.find({ userId: userId }, excludes);
 
         return res.status(200).json({
@@ -106,6 +127,12 @@ export async function getAnswersByUserId(req, res) {
 export async function getNumberOfCorrectAnswers(req, res) {
     try {
         const userId = req.user._id;
+        if (!isValidObjectId(userId)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid user ID format.",
+            });
+        }
         const answers = await Answer.find({ userId: userId });
         let count = 0;
         answers.forEach((answer) => {
@@ -131,7 +158,12 @@ export async function getAnswer(req, res) {
     try {
         const { locationId } = req.params;
         const userId = req.user._id;
-
+        if (!isValidObjectId(locationId) || !isValidObjectId(userId)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid ID format.",
+            });
+        }
         const updates = req.body;
         //console.log(updates);
         const allowedUpdated = ["answer", "isValid"];
@@ -168,6 +200,12 @@ function answerAge(answer) {
 
 export async function updateAnswerById(req, res) {
     const { answerId } = req.params;
+    if (!isValidObjectId(answerId)) {
+        return res.status(400).json({
+            status: "failed",
+            message: "Invalid answer ID format.",
+        });
+    }
     const updates = req.body;
     //console.log(updates);
     const allowedUpdated = ["answer", "question"];
@@ -229,6 +267,12 @@ export async function updateAnswerById(req, res) {
 export async function updateAnswerValidity(req, res) {
     try {
         const { answerID } = req.params;
+        if (!isValidObjectId(answerID)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid answer ID format.",
+            });
+        }
         const { isValid } = req.body;
         const answer = await Answer.findById(answerId);
         answer.isValid = isValid;
