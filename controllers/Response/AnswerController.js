@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { evaluateResponse } from "./AiCheck.js";
 import { getHuntStartStatus } from "../Hunt/HuntController.js";
 import { configManager } from "../GlobalSettingsModule/configManager.js";
+import mongoose from "mongoose";
 
 function isValidObjectId(id) {
     return mongoose.Types.ObjectId.isValid(id);
