@@ -2,7 +2,7 @@ import { check } from "express-validator";
 import { Verify, VerifyRole } from "../middleware/verify.js";
 import express from "express";
 
-import { submitAnswer, getAnswersByLocationId, getAnswersByUserId, updateAnswerValidity, getAnswer, updateAnswerById, getNumberOfCorrectAnswers } from "../controllers/Response/AnswerController.js";
+import { submitAnswer, getAnswersByLocationId, getAnswersByUserId, updateAnswerValidity, getAnswer, updateAnswerById, getNumberOfCorrectAnswers, checkAllAnswers } from "../controllers/Response/AnswerController.js";
 import { csvAllData } from "../controllers/Response/generateCsv.js";
 
 const router = express.Router();
@@ -45,4 +45,6 @@ router.get("/getAnswer/:locationId", Verify, getAnswer);
 router.get("/getAllAnswers", Verify, VerifyRole, csvAllData);
 
 router.get("/getNumberOfCorrectAnswers", Verify, getNumberOfCorrectAnswers);
+
+router.get("/checkAllAnswers", Verify,VerifyRole, checkAllAnswers);
 export default router;

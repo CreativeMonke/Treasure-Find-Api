@@ -144,7 +144,7 @@ export async function getNumberOfCorrectAnswers(req, res) {
         return res.status(200).json({
             status: "success",
             numberOfCorrectAnswers: count,
-            numberOfAnswers : answers.length
+            numberOfAnswers: answers.length
         });
     } catch (err) {
         console.log(err);
@@ -250,7 +250,7 @@ export async function updateAnswerById(req, res) {
 
         //console.log(correctAnswers);
         answer.evaluationScore = await evaluateResponse(answer.answer, correctAnswers);
-        if (answer.evaluationScore >= 70)
+        if (answer.evaluationScore >= 80)
             answer.isCorrectFinalEvaluation = true;
         await answer.save();
 
@@ -291,3 +291,43 @@ export async function updateAnswerValidity(req, res) {
     }
 }
 
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function checkAllAnswers(req, res) {
+    try {
+        const answersToEvaluate = await Answer.find({
+            $or: [
+                { evaluationScore: { $gte: 60, $lt: 80 }, answer: { $ne: " " } },
+                { evaluationScore: -1, answer: { $ne: " " } }
+            ]
+        });
+
+        for (let answer of answersToEvaluate) {
+            if (answer.evaluationScore === -1) {
+                const correctAnswers = answer.correctAnswer.split(';');
+                answer.evaluationScore = await evaluateResponse(answer.answer, correctAnswers);
+            }
+            if (answer.evaluationScore >= 80) {
+                answer.isCorrectFinalEvaluation = true;
+            } else {
+                answer.isCorrectFinalEvaluation = false;
+            }
+            await answer.save();
+            await delay(1500);
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: `Evaluated ${answersToEvaluate.length} answers.`
+        });
+    } catch (err) {
+        console.error('Error evaluating answers:', err);
+        return res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+            data: err.message
+        });
+    }
+}

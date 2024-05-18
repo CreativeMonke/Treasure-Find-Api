@@ -8,7 +8,7 @@ import App from "./routes/app.js";
 const server = express();
 const corsOptions = {
     origin: ['https://treasure-find.vercel.app','https://localhost:3000'],
-    credentials: true, // Allows credentials (cookies, authentication tokens) to be sent
+    credentials: true,
 };
 
 server.use(cors(corsOptions));
