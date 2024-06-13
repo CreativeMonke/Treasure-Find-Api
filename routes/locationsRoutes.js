@@ -1,5 +1,5 @@
 import express from "express";
-import { createLocation,editLocation,deleteLocation,getAllLocations } from "../controllers/Location/LocationsController.js";
+import { createLocation,editLocation,deleteLocation,getAllLocations, getAllLocationsByHuntId } from "../controllers/Location/LocationsController.js";
 import locateMiddleware from '../middleware/locate.js';
 
 import { Verify,VerifyRole } from "../middleware/verify.js";
@@ -20,5 +20,8 @@ router.delete("/locations/delete/:id",Verify,VerifyRole,locateMiddleware,deleteL
 // Get all locations -> Any User
 
 router.get("/locations/all",Verify,getAllLocations);
+
+// Get all locations for a specific hunt
+router.get("/locations/huntid",Verify,getAllLocationsByHuntId);
 
 export default router;

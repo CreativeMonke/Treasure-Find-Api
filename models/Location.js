@@ -1,39 +1,46 @@
-import mongoose from 'mongoose';
-import { poiDb } from "../config/databaseConfig.js"
+import mongoose from "mongoose";
+import { poiDb } from "../config/databaseConfig.js";
+import { ObjectId } from "mongodb";
 
 const LocationSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   imgSrc: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   question: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   answer: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
-  radius:{
+  radius: {
     type: Number,
-    default:130,
+    default: 130,
   },
   lat: {
     type: Number,
-    required: true
+    required: true,
   },
   lng: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
+  hunts: [
+    {
+      type: ObjectId,
+      ref: "hunts",
+    },
+  ],
 });
 
-export default poiDb.model('locations', LocationSchema);
+export default poiDb.model("locations", LocationSchema);

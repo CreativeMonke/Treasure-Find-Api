@@ -1,12 +1,15 @@
+import {
+  getHuntOptionsById,
+  getHuntStatusById,
+  updateHuntOptionsById,
+} from "../controllers/Hunt/HuntController.js";
 import { Verify, VerifyRole } from "../middleware/verify.js";
 import express from "express";
 
-import { getHuntOptions, updateHuntOptions } from "../controllers/Hunt/HuntController.js";
-
 const router = express.Router();
-///No user login required
-router.get("/globalInfo", getHuntOptions);
+router.get("/:huntId/options", Verify, getHuntOptionsById);
 ///admin required
-router.put("/edit", Verify, VerifyRole, updateHuntOptions);
+router.put("/:huntId/options", Verify, VerifyRole, updateHuntOptionsById);
 
+router.get("/:huntId/status", Verify, getHuntStatusById);
 export default router;

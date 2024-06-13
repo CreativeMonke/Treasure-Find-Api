@@ -1,67 +1,60 @@
-import fs from 'fs/promises';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-import { poiDb, userDb } from '../../config/databaseConfig.js';
-import { configManager } from '../GlobalSettingsModule/configManager.js';
+import { huntDb, poiDb, userDb } from '../../config/databaseConfig.js';
+import { ObjectId } from "mongodb";
 
-// Directly deriving the directory path of the current module
-const currentDir = dirname(fileURLToPath(import.meta.url));
-
-// Adjusting the path to point to your `globalOptions.json` file
-const configPath = join(currentDir, '../../config/globalOptions.json');
-
-// Cache for the configuration
-let cachedConfig = null;
-
-// Ensure the configuration file exists and load it
-async function initConfigFile() {
+// Function to get the current hunt options by hunt ID
+export async function getHuntOptionsById(req, res) {
+    const { huntId } = req.params;
     try {
-        await fs.access(configPath);
-        const data = await fs.readFile(configPath, 'utf8');
-        cachedConfig = JSON.parse(data);
-    } catch (error) {
-        cachedConfig = { startTime: null, endTime: null };
-        await fs.writeFile(configPath, JSON.stringify(cachedConfig, null, 2), 'utf8');
-    }
-}
+        const hunt = await huntDb.collection('hunts').findOne({ _id: new ObjectId(huntId) });
+        if (!hunt) {
+            return res.status(404).send('Hunt not found');
+        }
 
-// Initialize the config file to ensure it exists and is loaded into cache
-initConfigFile();
-
-// Function to get the current globalOptions
-
-export async function getHuntOptions(req, res) {
-    try {
-        await configManager.loadConfig(); // Ensure config is loaded
-        const config = configManager.getConfig();
-        const nrOfSignedUpUsers = await userDb.collection('user_infos').countDocuments();
-        const nrOfObjectives = await poiDb.collection('locations').countDocuments();
-        res.json({ ...config, nrOfSignedUpUsers, nrOfObjectives });
+        const nrOfSignedUpUsers = await userDb.collection('user_infos').countDocuments({ currentHuntId: new ObjectId(huntId) });
+        const nrOfObjectives = await poiDb.collection('locations').countDocuments({ hunts: new ObjectId(huntId) });
+        
+        res.json({ ...hunt, nrOfSignedUpUsers, nrOfObjectives });
     } catch (error) {
         console.error('Failed to read the hunt options:', error);
         res.status(500).send('Error fetching hunt options');
     }
 }
 
+// Function to update the hunt options by hunt ID
+export async function updateHuntOptionsById(req, res) {
+    const { huntId } = req.params;
+    const newOptions = req.body;
 
-// Function to update the globalOptions
-export async function updateHuntOptions(req, res) {
     try {
-        const newOptions = req.body;
-        await configManager.updateConfig(newOptions);
-        res.json(configManager.getConfig());
+        const updateResult = await huntDb.collection('hunts').updateOne(
+            { _id: new ObjectId(huntId) },
+            { $set: newOptions }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(404).send('Hunt not found');
+        }
+
+        const updatedHunt = await huntDb.collection('hunts').findOne({ _id: new ObjectId(huntId) });
+        res.json(updatedHunt);
     } catch (error) {
         console.error('Failed to update the hunt options:', error);
         res.status(500).send('Error updating hunt options');
     }
 }
 
-export async function getHuntStartStatus() {
+// Function to get the start status of a hunt by hunt ID
+export async function getHuntStatusById(req, res) {
+    const { huntId } = req.params;
+
     try {
-        await configManager.loadConfig(); // Ensure config is loaded and up to date
-        const config = configManager.getConfig();
-        const startTime = new Date(config.startTime);
-        const endTime = new Date(config.endTime);
+        const hunt = await huntDb.collection('hunts').findOne({ _id: new ObjectId(huntId) });
+        if (!hunt) {
+            return res.status(404).send('Hunt not found');
+        }
+
+        const startTime = new Date(hunt.startTime);
+        const endTime = new Date(hunt.endTime);
         const currentTime = new Date();
 
         let status;
@@ -72,9 +65,9 @@ export async function getHuntStartStatus() {
         } else if (currentTime > endTime) {
             status = "ended";
         }
-        return status;
-    } catch (err) {
-        console.error('Failed to get the hunt status:', err);
-        throw err;
+        res.json({ status });
+    } catch (error) {
+        console.error('Failed to get the hunt status:', error);
+        res.status(500).send('Error fetching hunt status');
     }
 }

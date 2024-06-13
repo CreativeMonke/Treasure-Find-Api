@@ -1,4 +1,3 @@
-// models/TemporaryRegistration.js
 import mongoose from "mongoose";
 import { userDb } from "../config/databaseConfig.js";
 
