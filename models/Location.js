@@ -35,6 +35,14 @@ const LocationSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  town:{
+    type: String,
+    trim: true,
+  },
+  author_id:{
+    type: ObjectId,
+    ref: "user_infos",
+  },
   hunts: [
     {
       type: ObjectId,

@@ -22,7 +22,7 @@ export async function createLocation(req, res) {
     console.error(err);
     res.status(500).json({
       status: "error",
-      code: 500,
+      data: [err],
       message: "Internal server error",
     });
   }
@@ -53,6 +53,7 @@ export async function editLocation(req, res) {
     console.error(err);
     res.status(500).json({
       status: "error",
+      data: [err],
       message: "Internal Server Error",
     });
   }
@@ -77,6 +78,7 @@ export async function deleteLocation(req, res) {
     console.error(err);
     res.status(500).json({
       status: "error",
+      data: [err],
       message: "Internal server error",
     });
   }
@@ -87,7 +89,6 @@ export async function getAllLocations(req, res) {
     if (!locations)
       return res.status(404).json({
         status: "error",
-        code: 404,
         message: "Locations not found",
       });
     res.status(200).json({
@@ -99,14 +100,14 @@ export async function getAllLocations(req, res) {
     console.error(err);
     res.status(500).json({
       status: "error",
+      data: [err],
       message: "Internal server error",
     });
   }
 }
 
-export async function getAllLocationsByHuntId(req, res) {
+export async function getAllLocationsByUserHuntId(req, res) {
   try {
-    const user = await User.findById(req.user._id);
     const huntId = req.user.currentHuntId;
     const locations = await Location.find({ huntId });
     if (!locations)
@@ -124,6 +125,57 @@ export async function getAllLocationsByHuntId(req, res) {
     console.error(err);
     res.status(500).json({
       status: "error",
+      data: [err],
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function getAllLocationsByHuntId(req, res) {
+  const { huntId } = req.params;
+  try {
+    const locations = await Location.find({ huntId });
+    if (!locations)
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Locations not found",
+      });
+    res.status(200).json({
+      status: "success",
+      data: locations,
+      message: "Locations fetched successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      data: [err],
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function getAllLocationsByAuthorId(req, res) {
+  const { _id: userId } = req.user;
+  ///fetch all locations based on the author_id
+  try {
+    const locations = await Location.find({ author_id: userId });
+    if (!locations)
+      return res.status(404).json({
+        status: "error",
+        message: "Locations not found",
+      });
+    res.status(200).json({
+      status: "success",
+      data: locations,
+      message: "Locations fetched successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      data: [err],
       message: "Internal server error",
     });
   }

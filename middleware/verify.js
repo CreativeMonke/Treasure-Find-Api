@@ -52,7 +52,7 @@ export async function VerifyRole(req, res, next) {
     try {
         const user = req.user;
         const { role } = user;
-        if (role !== "0x88") {
+        if (role < "0x88") {
             return res.status(401).json({
                 status: "failed",
                 message: "You are not authorized to view this page",
@@ -62,7 +62,6 @@ export async function VerifyRole(req, res, next) {
     } catch (err) {
         return res.status(500).json({
             status: "failed",
-            code: 500,
             data: [err],
             message: "Internal Server Error",
         });

@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 import { huntDb } from '../../config/databaseConfig.js';
 
 function isValidObjectId(id) {
-    return mongoose.Types.ObjectId.isValid(id);
+    return mongoose.Types.ObjectId.isValid(id) && id !== null;
 }
 
 export async function submitAnswer(req, res) {
@@ -82,11 +82,13 @@ export async function getAnswersByLocationId(req, res) {
         return res.status(200).json({
             status: "success",
             data: answers,
+            message: "Answers fetched successfully",
         });
     } catch (err) {
         console.log(err);
         return res.status(500).json({
             status: "error",
+            data : [err],
             message: "Internal Server Error",
         });
     }
@@ -95,7 +97,7 @@ export async function getAnswersByLocationId(req, res) {
 export async function getAnswersByUserId(req, res) {
     try {
         const userId = req.user._id;
-        const { huntId } = req.params;
+        const huntId  = req.user.currentHuntId;
 
         if (!isValidObjectId(userId) || !isValidObjectId(huntId)) {
             return res.status(400).json({
@@ -104,24 +106,17 @@ export async function getAnswersByUserId(req, res) {
             });
         }
 
-        const huntStatus = await getHuntStatusById({ params: { huntId } });
-        const hunt = await huntDb.collection('hunts').findOne({ _id: new ObjectId(huntId) });
-        let excludes = { correctAnswer: 0, evaluationScore: 0 };
-
-        if (huntStatus.status === 'ended' && hunt.answersReady) {
-            excludes = {}; // Removing the projection limitations
-        }
-
-        const answers = await Answer.find({ userId: userId, huntId: huntId }, excludes);
+        const answers = await Answer.find({ userId: userId, huntId: huntId });
         return res.status(200).json({
             status: "success",
             data: answers,
+            message: "Answers fetched successfully",
         });
     } catch (err) {
         console.error('Error fetching user answers:', err);
         return res.status(500).json({
             status: "error",
-            data: [err.message],
+            data: [err],
             message: "Internal Server Error",
         });
     }
@@ -151,6 +146,7 @@ export async function getNumberOfCorrectAnswers(req, res) {
             status: "success",
             numberOfCorrectAnswers: count,
             numberOfAnswers: answers.length,
+            message: "Answers fetched successfully",
         });
     } catch (err) {
         console.log(err);

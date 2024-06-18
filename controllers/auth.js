@@ -10,7 +10,6 @@ export async function Login(req, res) {
         if (!user)
             return res.status(401).json({
                 status: "failed",
-                data: [],
                 message: "Invalid email or password",
             });
         const isPasswordValid = await bcrypt.compare(
@@ -20,7 +19,6 @@ export async function Login(req, res) {
         if (!isPasswordValid)
             return res.status(401).json({
                 status: "failed",
-                data: [],
                 message: "Invalid email or password",
             });
 
@@ -43,8 +41,7 @@ export async function Login(req, res) {
     } catch (err) {
         res.status(500).json({
             status: "error",
-            code: 500,
-            data: [],
+            data: [err],
             message: "Internal server error",
         });
     }
@@ -88,7 +85,7 @@ export async function Register(req, res) {
         console.log(err);
         res.status(500).json({
             status: "error",
-            code: 500,
+            data : [err],
             message: "Internal Server Error",
         });
     }
@@ -125,6 +122,7 @@ export async function VerifyEmail(req, res) {
         console.log(err);
         res.status(500).json({
             status: "error",
+            data : [err],
             message: "Internal Server Error",
         });
     }
@@ -146,11 +144,13 @@ export async function Logout(req, res) {
         await newBlacklist.save();
 
         res.status(200).json({
+            statusbar: 'success',
             message: "You are logged out!",
         });
     } catch (err) {
         res.status(500).json({
             status: "error",
+            data : [err],
             message: "Internal Server Error",
         });
     }
@@ -161,12 +161,14 @@ export async function checkLogin(req, res) {
     try {
         const sessionId = req.headers.sessionid;
         res.status(200).json({
+            status : "success",
             message: "Go for login",
         });
     } catch (err) {
         res.status(500).json({
             status: "error",
-            message: err,
+            data: [err],
+            message: "Internal Server Error",
         });
     }
     res.end();
