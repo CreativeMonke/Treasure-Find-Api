@@ -34,7 +34,7 @@ export async function Login(req, res) {
         const { password, ...user_data } = user._doc;
         return res.status(200).json({
             status: "succes",
-            user: [user_data],
+            user: user_data,
             sessionId: token,
             message: "Succesful login",
         });
@@ -162,6 +162,7 @@ export async function checkLogin(req, res) {
         const sessionId = req.headers.sessionid;
         res.status(200).json({
             status : "success",
+            data : req.user,
             message: "Go for login",
         });
     } catch (err) {
@@ -171,5 +172,4 @@ export async function checkLogin(req, res) {
             message: "Internal Server Error",
         });
     }
-    res.end();
 }

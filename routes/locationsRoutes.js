@@ -25,7 +25,7 @@ router.get("/locations/all",Verify,getAllLocations);
 router.get("/locations/huntid",Verify,getAllLocationsByUserHuntId);
 
 // Get all locations for a specific hunt
-router.get("/locations/huntid/:huntid",Verify,getAllLocationsByHuntId);
+router.get("/locations/huntid/:huntId",Verify,getAllLocationsByHuntId);
 
 // Get all locations created by a user
 

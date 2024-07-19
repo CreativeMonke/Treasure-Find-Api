@@ -45,6 +45,12 @@ const UserSchema = new mongoose.Schema(
         ref: "hunts",
       },
     ],
+    createdLocationIds:[
+      {
+        type: ObjectId,
+        ref: "locations",
+      },
+    ],
     currentHuntId: {
       type: ObjectId,
       ref: "hunts",
@@ -93,5 +99,33 @@ UserSchema.methods.generateAccessJWT = function () {
     expiresIn: "240m",
   });
 };
+
+UserSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+  const userId = this._id;
+
+  // Update created hunts and locations
+  await mongoose.model("hunts").updateMany(
+    { author_id: userId },
+    { $unset: { author_id: "" } }
+  );
+
+  await mongoose.model("locations").updateMany(
+    { author_id: userId },
+    { $unset: { author_id: "" } }
+  );
+
+  // Update current hunts and hunt states
+  await mongoose.model("hunts").updateMany(
+    { participating_user_ids: userId },
+    { $pull: { participating_user_ids: userId } }
+  );
+
+  await mongoose.model("answers").updateMany(
+    { userId },
+    { $unset: { userId: "" } }
+  );
+
+  next();
+});
 
 export default userDb.model("user_infos", UserSchema);

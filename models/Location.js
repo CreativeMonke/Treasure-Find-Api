@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { poiDb } from "../config/databaseConfig.js";
 import { ObjectId } from "mongodb";
-
+import Answer from "./Response.js";
+import Hunt from "./Hunt.js";
 const LocationSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -35,11 +36,11 @@ const LocationSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  town:{
+  town: {
     type: String,
     trim: true,
   },
-  author_id:{
+  author_id: {
     type: ObjectId,
     ref: "user_infos",
   },
@@ -49,6 +50,25 @@ const LocationSchema = new mongoose.Schema({
       ref: "hunts",
     },
   ],
+});
+
+LocationSchema.pre("findOneAndDelete", { query: true }, async function (next) {
+  const locationId = this.getQuery()._id;
+  console.log("Deleting location " + locationId);
+
+  try {
+    // Remove related hunts and answers
+    await Hunt.updateMany(
+      { location_ids: locationId },
+      { $pull: { location_ids: locationId } }
+    );
+
+    await Answer.deleteMany({ locationId });
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default poiDb.model("locations", LocationSchema);

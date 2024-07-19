@@ -2,6 +2,7 @@ import { huntDb, poiDb, userDb } from "../../config/databaseConfig.js";
 import { ObjectId } from "mongodb";
 import Hunt from "../../models/Hunt.js";
 import User from "../../models/User.js";
+import Location from "../../models/Location.js";
 
 // Function to get the current hunt options by hunt ID
 export async function getHuntOptionsById(req, res) {
@@ -39,23 +40,54 @@ export async function getHuntOptionsById(req, res) {
 export async function updateHuntOptionsById(req, res) {
   const { huntId } = req.params;
   const newOptions = req.body;
+  const { location_ids } = newOptions;
 
   try {
-    const updateResult = await huntDb
-      .collection("hunts")
-      .updateOne({ _id: new ObjectId(huntId) }, { $set: newOptions });
-
-    if (updateResult.matchedCount === 0) {
-      return res.status(404).send("Hunt not found");
+    // Retrieve the current hunt options from the database
+    const hunt = await Hunt.findById(huntId);
+    if (!hunt) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Hunt not found",
+      });
     }
 
-    const updatedHunt = await huntDb
-      .collection("hunts")
-      .findOne({ _id: new ObjectId(huntId) });
-    res.json(updatedHunt);
+    // Merge the new options with the current options
+    const updatedOptions = {
+      ...hunt.toObject(), // Convert the mongoose document to a plain object
+      ...newOptions,
+    };
+
+    // Update the hunt options in the database
+    await Hunt.findByIdAndUpdate(huntId, updatedOptions, { new: true });
+
+    // Update the locations to reflect which hunt they belong to
+    if (location_ids) {
+      // Clear existing hunt references from locations
+      await Location.updateMany(
+        { hunts: huntId },
+        { $pull: { hunts: huntId } }
+      );
+
+      // Add the hunt reference to the new locations
+      await Location.updateMany(
+        { _id: { $in: location_ids } },
+        { $addToSet: { hunts: huntId } }
+      );
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: updatedOptions,
+      message: "Hunt options updated successfully",
+    });
   } catch (error) {
     console.error("Failed to update the hunt options:", error);
-    res.status(500).send("Error updating hunt options");
+    res.status(500).json({
+      status: "failed",
+      message: "Error updating hunt options",
+      data: [error.message],
+    });
   }
 }
 
@@ -119,15 +151,26 @@ export async function getAllHunts(req, res) {
 
 export async function createHunt(req, res) {
   try {
-    const { huntName, townName, startTime, endTime } = req.body;
-    ///Create new hunt object from deconstructed JSON
+    const {
+      huntName,
+      townName,
+      startTime,
+      endTime,
+      areAnswersReady,
+      location_ids,
+    } = req.body;
+    const { _id: userId } = req.user;
+    ///Create new hunt object from deconstructed JSON, then add "author_id" from userId
     const newHunt = new Hunt({
       huntName,
       townName,
       startTime,
       endTime,
+      areAnswersReady,
+      location_ids,
+      author_id: userId,
     });
-
+    console.log(newHunt);
     ///Insert new hunt object in the database, if the name is not already in the database
     const hunts = await huntDb.collection("hunts").find({ huntName }).toArray();
     if (hunts.length > 0) {
@@ -140,6 +183,13 @@ export async function createHunt(req, res) {
     const hunt = await huntDb
       .collection("hunts")
       .findOne({ _id: insertResult.insertedId });
+    ///Add the huntId to the createdHuntIds in the user
+    await userDb
+      .collection("user_infos")
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $push: { createdHuntIds: new ObjectId(insertResult.insertedId) } }
+      );
     res.json({
       status: "success",
       data: hunt,
@@ -170,43 +220,19 @@ export async function joinHuntById(req, res) {
 
     let userUpdateQuery = { _id: userId };
     let userUpdateData = { currentHuntId: huntId };
-    let userUpdateOptions = { new: true };
     if (req.user.currentHuntId) {
-      // Set the hasEndedHunt to true in the old hunt's state
-      userUpdateData["huntState.$[elem].hasEndedHunt"] = true;
-      userUpdateOptions["arrayFilters"] = [
-        { "elem.huntId": req.user.currentHuntId },
-      ];
-
-      // Remove user from the old hunt's participating users
       await Hunt.updateOne(
         { _id: req.user.currentHuntId },
         { $pull: { participating_user_ids: userId } }
       );
     }
 
-    // Update user's current hunt and huntState
-    await User.updateOne(
-      userUpdateQuery,
-      { $set: userUpdateData },
-      userUpdateOptions
-    );
+    await User.updateOne(userUpdateQuery, { $set: userUpdateData });
 
-    // Ensure the huntState array is updated for the new hunt
     const huntStateIndex = req.user.huntState.findIndex(
       (state) => state.huntId.toString() === huntId
     );
-    if (huntStateIndex > -1) {
-      await User.updateOne(
-        { _id: userId, "huntState.huntId": huntId },
-        {
-          $set: {
-            "huntState.$.hasStartedHunt": true,
-            "huntState.$.hasEndedHunt": true,
-          },
-        }
-      );
-    } else {
+    if (huntStateIndex === -1) {
       await User.updateOne(
         { _id: userId },
         {
@@ -220,8 +246,6 @@ export async function joinHuntById(req, res) {
         }
       );
     }
-
-    // Add user to new hunt's participating users
     await Hunt.updateOne(
       { _id: huntId },
       { $addToSet: { participating_user_ids: userId } }
@@ -229,6 +253,7 @@ export async function joinHuntById(req, res) {
 
     res.status(200).json({
       status: "success",
+      data: hunt,
       message: "Hunt joined successfully!",
     });
   } catch (error) {
@@ -240,17 +265,98 @@ export async function joinHuntById(req, res) {
   }
 }
 
-export async function getHuntLocationsById(req, res) {
+export async function deleteHuntById(req, res) {
+  const { huntId } = req.params;
+
   try {
-    const { huntId } = req.params;
-    const { _id: userId } = req.user;
+    await Hunt.deleteOne({ _id: huntId });
 
-
-    const locations = await Location.find({ hunts: huntId });
-    res.json({
+    res.status(200).json({
       status: "success",
-      data: locations,
-      message: "Hunt locations retrieved successfully!",
+      message: "Hunt deleted successfully!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "error",
+      data: [err],
+      message: "Internal Server Error",
+    });
+  }
+}
+
+export async function getCurrentHuntByUserId(req, res) {
+  const { currentHuntId } = req.user;
+  if (!currentHuntId) {
+    return res.status(200).json({
+      status: "success",
+      data: [],
+      message: "User hasn't joined a hunt!",
+    });
+  }
+  ///Get hunt by currentHuntId
+  const hunt = await Hunt.findById(currentHuntId);
+  if (!hunt) {
+    return res.status(404).json({
+      status: "error",
+      message: "Hunt not found",
+    });
+  }
+  res.status(200).json({
+    status: "success",
+    data: hunt,
+    message: "Hunt fetched successfully!",
+  });
+}
+
+export async function exitHuntByUserHuntId(req, res) {
+  const { _id: userId } = req.user;
+  const { currentHuntId } = req.user;
+  console.log(req.user);
+  try {
+    if (!currentHuntId) {
+      return res.status(200).json({
+        status: "success",
+        message: "User hasn't joined a hunt!",
+      });
+    }
+    await User.updateOne(
+      { _id: userId },
+      { $set: { currentHuntId: null } }
+    );
+    await Hunt.updateOne(
+      { _id: currentHuntId },
+      { $pull: { participating_user_ids: userId } }
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "User exited the hunt successfully!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "error",
+      data: [err],
+      message: "Internal Server Error",
+    });
+  }
+}
+
+export async function exitHuntByHuntId(req, res) {
+  const { huntId } = req.params;
+  const { _id: userId } = req.user;
+  try {
+    await Hunt.updateOne(
+      { _id: huntId },
+      { $pull: { participating_user_ids: userId } }
+    );
+    await User.updateOne({ _id: userId }, { $set: { currentHuntId: null } });
+
+    res.status(200).json({
+      status: "success",
+
+      message: "User exited the hunt successfully!",
     });
   } catch (err) {
     console.log(err);

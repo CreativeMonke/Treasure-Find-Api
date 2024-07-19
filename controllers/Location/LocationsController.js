@@ -2,6 +2,7 @@ import Location from "../../models/Location.js";
 
 export async function createLocation(req, res) {
   const { name, imgSrc, question, answer, lat, lng } = req.body;
+  const { _id: userId } = req.user;
 
   try {
     const location = new Location({
@@ -11,6 +12,7 @@ export async function createLocation(req, res) {
       answer,
       lat,
       lng,
+      author_id: userId,
     });
     await location.save();
     res.status(201).json({
@@ -109,7 +111,7 @@ export async function getAllLocations(req, res) {
 export async function getAllLocationsByUserHuntId(req, res) {
   try {
     const huntId = req.user.currentHuntId;
-    const locations = await Location.find({ huntId });
+    const locations = await Location.find({ hunts: huntId });
     if (!locations)
       return res.status(404).json({
         status: "error",
@@ -134,7 +136,7 @@ export async function getAllLocationsByUserHuntId(req, res) {
 export async function getAllLocationsByHuntId(req, res) {
   const { huntId } = req.params;
   try {
-    const locations = await Location.find({ huntId });
+    const locations = await Location.find({ hunts: huntId });
     if (!locations)
       return res.status(404).json({
         status: "error",
