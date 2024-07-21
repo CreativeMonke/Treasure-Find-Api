@@ -5,9 +5,9 @@ import locateMiddleware from '../middleware/locate.js';
 import { Verify,VerifyRole } from "../middleware/verify.js";
 const router = express.Router();
 
-// Create a new location -> Admin Only
+// Create a new location
 
-router.post("/locations/create",Verify,VerifyRole,createLocation);
+router.post("/locations/create",Verify,createLocation);
 
 // Update a location -> Admin Only
 
