@@ -22,10 +22,10 @@ router.delete("/locations/delete/:id",Verify,VerifyRole,locateMiddleware,deleteL
 router.get("/locations/all",Verify,getAllLocations);
 
 // Get all locations for the users's hunt
-router.get("/locations/huntid",Verify,getAllLocationsByUserHuntId);
+router.get("/locations/huntId",Verify,getAllLocationsByUserHuntId);
 
 // Get all locations for a specific hunt
-router.get("/locations/huntid/:huntId",Verify,getAllLocationsByHuntId);
+router.get("/locations/huntId/:huntId",Verify,getAllLocationsByHuntId);
 
 // Get all locations created by a user
 

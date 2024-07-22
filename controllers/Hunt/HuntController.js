@@ -178,23 +178,34 @@ export async function createHunt(req, res) {
         status: "failed",
         message: "A hunt with that name already exists!",
       });
+    } else {
+      const insertResult = await huntDb.collection("hunts").insertOne(newHunt);
+      const hunt = await huntDb
+        .collection("hunts")
+        .findOne({ _id: insertResult.insertedId });
+      ///Add the huntId to the createdHuntIds in the user
+
+      await userDb
+        .collection("user_infos")
+        .updateOne(
+          { _id: new ObjectId(userId) },
+          { $push: { createdHuntIds: new ObjectId(insertResult.insertedId) } }
+        );
+
+      ///Add the huntId to the locations
+      if (location_ids) {
+        await Location.updateMany(
+          { _id: { $in: location_ids } },
+          { $addToSet: { hunts: hunt._id } }
+        );
+      }
+
+      res.status(201).json({
+        status: "success",
+        data: hunt,
+        message: "Hunt created successfully!",
+      });
     }
-    const insertResult = await huntDb.collection("hunts").insertOne(newHunt);
-    const hunt = await huntDb
-      .collection("hunts")
-      .findOne({ _id: insertResult.insertedId });
-    ///Add the huntId to the createdHuntIds in the user
-    await userDb
-      .collection("user_infos")
-      .updateOne(
-        { _id: new ObjectId(userId) },
-        { $push: { createdHuntIds: new ObjectId(insertResult.insertedId) } }
-      );
-    res.json({
-      status: "success",
-      data: hunt,
-      message: "Hunt created successfully!",
-    });
   } catch (error) {
     console.error("Failed to create the hunt:", error);
     res.status(500).json({
@@ -320,10 +331,7 @@ export async function exitHuntByUserHuntId(req, res) {
         message: "User hasn't joined a hunt!",
       });
     }
-    await User.updateOne(
-      { _id: userId },
-      { $set: { currentHuntId: null } }
-    );
+    await User.updateOne({ _id: userId }, { $set: { currentHuntId: null } });
     await Hunt.updateOne(
       { _id: currentHuntId },
       { $pull: { participating_user_ids: userId } }
