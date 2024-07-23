@@ -49,7 +49,6 @@ export async function submitAnswer(req, res) {
         message: "Location not found!",
       });
     }
-
     const newAnswer = new Answer({
       question: question,
       answer: answer,
@@ -133,7 +132,7 @@ export async function getAnswersByUserId(req, res) {
   }
 }
 
-export async function getNumberOfCorrectAnswers(req, res) {
+export async function getNumberOfCorrectAnswersByHuntId(req, res) {
   try {
     const userId = req.user._id;
     const { huntId } = req.params;
@@ -229,7 +228,7 @@ function answerAge(answer) {
 
 export async function updateAnswerById(req, res) {
   const { answerId } = req.params;
-  const  huntId  = req.user.currentHuntId;
+  const huntId = req.user.currentHuntId;
 
   if (!isValidObjectId(answerId) || !isValidObjectId(huntId)) {
     return res.status(400).json({

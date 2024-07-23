@@ -100,7 +100,7 @@ export async function CsvAllDataByHuntId(req, res) {
         .status(404)
         .json({ status: "error", message: "Hunt not found" });
     }
-    console.log("hunt", hunt);
+    //console.log("hunt", hunt);
     const answers = await Answer.find({ huntId })
       .populate({
         path: "userId",
@@ -113,7 +113,7 @@ export async function CsvAllDataByHuntId(req, res) {
         select: "name",
       })
       .exec();
-    console.log("answers", answers);
+    //console.log("answers", answers);
     let csvData = answers
       .map((answer) => {
         const userData = answer.userId;
@@ -124,6 +124,7 @@ export async function CsvAllDataByHuntId(req, res) {
           );
           return null;
         }
+        console.log("correctAnswer", answer);
         return {
           firstName: userData.first_name,
           lastName: userData.last_name,
@@ -137,7 +138,7 @@ export async function CsvAllDataByHuntId(req, res) {
       })
       .filter((row) => row !== null);
 
-    console.log("csvData", csvData);
+    //console.log("csvData", csvData);
 
     const csvFields = {
       keys: [

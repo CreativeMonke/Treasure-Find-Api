@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { responsesDb } from "../config/databaseConfig.js";
 import { ObjectId } from "mongodb";
 
-
 const answerSchema = new mongoose.Schema(
   {
     question: {
@@ -48,6 +47,6 @@ const answerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-answerSchema.index({ userId: 1, locationId: 1 }, { unique: true });
+answerSchema.index({ userId: 1, locationId: 1, huntId: 1 }, { unique: true });
 
 export default responsesDb.model("answers", answerSchema);
