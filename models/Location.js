@@ -3,6 +3,7 @@ import { poiDb } from "../config/databaseConfig.js";
 import { ObjectId } from "mongodb";
 import Answer from "./Response.js";
 import Hunt from "./Hunt.js";
+import User from "./User.js";
 const LocationSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -42,7 +43,7 @@ const LocationSchema = new mongoose.Schema({
   },
   author_id: {
     type: ObjectId,
-    ref: "user_infos",
+    ref: User,
   },
   hunts: [
     {

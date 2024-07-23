@@ -27,18 +27,18 @@ const HuntSchema = new mongoose.Schema(
     author_id: {
       type: ObjectId,
       required: true,
-      ref: "user_infos",
+      ref: User,
     },
     location_ids: [
       {
         type: ObjectId,
-        ref: "locations",
+        ref: Location,
       },
     ],
     answer_ids: [
       {
         type: ObjectId,
-        ref: "answers",
+        ref: Answer,
       },
     ],
     areAnswersReady: {
@@ -48,7 +48,7 @@ const HuntSchema = new mongoose.Schema(
     participating_user_ids: [
       {
         type: ObjectId,
-        ref: "user_infos",
+        ref: User,
       },
     ],
   },
@@ -91,7 +91,6 @@ HuntSchema.post(
         { hunts: huntId },
         { $pull: { hunts: huntId } }
       );
-
     } catch (err) {
       console.log(err);
     }

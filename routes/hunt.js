@@ -10,6 +10,7 @@ import {
   joinHuntById,
   updateHuntOptionsById,
 } from "../controllers/Hunt/HuntController.js";
+import { CsvAllDataByHuntId } from "../controllers/Response/generateCsv.js";
 import { Verify, VerifyOwnership, VerifyRole } from "../middleware/verify.js";
 import express from "express";
 
@@ -22,7 +23,7 @@ router.get("/:huntId/status", Verify, getHuntStatusById);
 
 router.get("/getAllHunts", Verify, getAllHunts);
 
-router.get("/getCurrentHunt" , Verify, getCurrentHuntByUserId);
+router.get("/getCurrentHunt", Verify, getCurrentHuntByUserId);
 
 router.get("/:huntId/join", Verify, joinHuntById);
 
@@ -33,4 +34,11 @@ router.get("/:huntId/delete", Verify, VerifyOwnership, deleteHuntById);
 router.get("/exitCurrentHunt", Verify, exitHuntByUserHuntId);
 
 router.get("/:huntId/exit", Verify, exitHuntByHuntId);
+
+router.get(
+  "/:huntId/getAllAnswers",
+  Verify,
+  VerifyOwnership,
+  CsvAllDataByHuntId
+);
 export default router;
