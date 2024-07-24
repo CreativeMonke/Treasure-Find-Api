@@ -137,7 +137,7 @@ export async function getAllLocationsByHuntId(req, res) {
   const { huntId } = req.params;
   try {
     const locations = await Location.find({ hunts: huntId });
-    console.log("Locations - byHuntId", locations);
+    //console.log("Locations - byHuntId", locations);
     if (!locations)
       return res.status(404).json({
         status: "error",
