@@ -56,7 +56,7 @@ export async function sendVerificationEmail(req, res) {
       await tempChange.save();
 
       const mailOptions = {
-        from: "support.roamify@roamify.vercel.app",
+        from: "support.roamify@treasurefindonigim.cloud",
         to: email,
         subject: "Verification Code",
         text: `Please use the following code to verify your information: ${verificationCode}`,
