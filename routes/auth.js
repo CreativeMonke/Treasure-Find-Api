@@ -1,4 +1,10 @@
-import { Login, Register, checkLogin, Logout, VerifyEmail } from "../controllers/auth.js";
+import {
+  Login,
+  Register,
+  checkLogin,
+  Logout,
+  VerifyEmail,
+} from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check } from "express-validator";
 import express from "express";
@@ -8,10 +14,7 @@ const router = express.Router();
 
 router.post(
   "/register",
-  check("email")
-    .isEmail()
-    .withMessage("Enter a valid email address")
-    .normalizeEmail(),
+  check("email").isEmail().withMessage("Enter a valid email address"),
   check("first_name")
     .not()
     .isEmpty()
@@ -32,26 +35,24 @@ router.post(
   Validate,
   Register
 );
-router.post("/verifyEmail",
+router.post(
+  "/verifyEmail",
   check("email")
     .isEmail()
     .withMessage("Enter a valid email address")
     .normalizeEmail(),
   Validate,
-  VerifyEmail);
-router.get('/checkLoggedIn', Verify, checkLogin);
+  VerifyEmail
+);
+router.get("/checkLoggedIn", Verify, checkLogin);
 router.post(
   "/login",
-  check("email")
-    .isEmail()
-    .withMessage("Enter a valid email address")
-    .normalizeEmail(),
-  check("password")
-    .not()
-    .isEmpty(),
+  check("email").isEmail().withMessage("Enter a valid email address"),
+  check("password").not().isEmpty(),
   Validate,
-  Login,
+  Login
 );
 router.get("/logout", Verify, Logout);
+
 
 export default router;

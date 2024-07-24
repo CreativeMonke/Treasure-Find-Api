@@ -115,18 +115,20 @@ export async function endHunt(req, res) {
     });
   }
 }
-
-export async function editUserById(req, res) {
+export async function editUserById(req, res, { aditionalUpdates = [] }) {
   try {
     const { userId } = req.params;
     const updates = req.body;
+
     const allowedUpdates = [
       "first_name",
       "last_name",
+      "email",
       "town",
-      "role",
       "password",
+      ...aditionalUpdates,
     ];
+
     const actualUpdates = Object.keys(updates).filter((key) =>
       allowedUpdates.includes(key)
     );
