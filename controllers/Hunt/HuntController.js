@@ -170,7 +170,7 @@ export async function createHunt(req, res) {
       location_ids,
       author_id: userId,
     });
-    console.log(newHunt);
+    //console.log(newHunt);
     ///Insert new hunt object in the database, if the name is not already in the database
     const hunts = await huntDb.collection("hunts").find({ huntName }).toArray();
     if (hunts.length > 0) {
@@ -323,7 +323,7 @@ export async function getCurrentHuntByUserId(req, res) {
 export async function exitHuntByUserHuntId(req, res) {
   const { _id: userId } = req.user;
   const { currentHuntId } = req.user;
-  console.log(req.user);
+  //console.log(req.user);
   try {
     if (!currentHuntId) {
       return res.status(200).json({
