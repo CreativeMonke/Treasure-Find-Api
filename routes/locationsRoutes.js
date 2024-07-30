@@ -1,8 +1,8 @@
 import express from "express";
-import { createLocation,editLocation,deleteLocation,getAllLocations, getAllLocationsByAuthorId, getAllLocationsByUserHuntId, getAllLocationsByHuntId } from "../controllers/Location/LocationsController.js";
+import { createLocation,editLocation,deleteLocation,getAllLocations, getAllLocationsByAuthorId, getAllLocationsByUserHuntId, getAllLocationsByHuntId, fixUserCreatedLocations } from "../controllers/Location/LocationsController.js";
 import locateMiddleware from '../middleware/locate.js';
 
-import { Verify,VerifyRole } from "../middleware/verify.js";
+import { Verify,VerifyOwnership,VerifyRole } from "../middleware/verify.js";
 const router = express.Router();
 
 // Create a new location
@@ -11,11 +11,11 @@ router.post("/locations/create",Verify,createLocation);
 
 // Update a location -> Admin Only
 
-router.put("/locations/edit/:id",Verify,VerifyRole,locateMiddleware,editLocation);
+router.put("/locations/edit/:locationId",Verify,VerifyOwnership,locateMiddleware,editLocation);
 
 // Delete a location -> Admin Only
 
-router.delete("/locations/delete/:id",Verify,VerifyRole,locateMiddleware,deleteLocation);
+router.delete("/locations/delete/:locationId",Verify,VerifyOwnership,locateMiddleware,deleteLocation);
 
 // Get all locations -> Any User
 
@@ -30,4 +30,6 @@ router.get("/locations/huntId/:huntId",Verify,getAllLocationsByHuntId);
 // Get all locations created by a user
 
 router.get("/locations/authorid",Verify,getAllLocationsByAuthorId);
+
+router.get("/locations/fixDb",Verify,fixUserCreatedLocations);
 export default router;

@@ -82,7 +82,7 @@ export async function VerifyOwnership(req, res, next) {
     const { _id, createdHuntIds, createdLocationIds } = req.user;
     const { huntId, locationId, answerId } = req.params;
     console.log(huntId, locationId, answerId);
-    console.log(_id, createdHuntIds, createdLocationIds);
+    console.log(_id, createdHuntIds, "createdLOcationIds", createdLocationIds);
     if (huntId) {
       // Check if user owns the hunt
       if (!createdHuntIds.includes(huntId)) {
@@ -121,7 +121,7 @@ export async function VerifyOwnership(req, res, next) {
     return res.status(500).json({
       status: "failed",
       message: "Internal Server Error",
-      data: [err.message], 
+      data: [err.message],
     });
   }
 }

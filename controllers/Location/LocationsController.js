@@ -1,4 +1,6 @@
 import Location from "../../models/Location.js";
+import User from "../../models/User.js";
+import { ObjectId } from "mongodb";
 
 export async function createLocation(req, res) {
   const { name, imgSrc, question, answer, lat, lng } = req.body;
@@ -15,6 +17,10 @@ export async function createLocation(req, res) {
       author_id: userId,
     });
     await location.save();
+    await User.updateOne(
+      { _id: new ObjectId(userId) },
+      { $push: { createdLocationIds: new ObjectId(location._id) } }
+    );
     res.status(201).json({
       status: "success",
       data: location,
@@ -32,7 +38,7 @@ export async function createLocation(req, res) {
 
 export async function editLocation(req, res) {
   const updates = req.body;
-  const { id } = req.params;
+  const { locationId: id } = req.params;
   const location = await Location.findById(id);
   if (!location) {
     return res.status(404).json({
@@ -62,7 +68,7 @@ export async function editLocation(req, res) {
 }
 
 export async function deleteLocation(req, res) {
-  const { id } = req.params;
+  const { locationId: id } = req.params;
   try {
     const location = await Location.findByIdAndDelete(id);
     if (!location)
@@ -181,5 +187,34 @@ export async function getAllLocationsByAuthorId(req, res) {
       data: [err],
       message: "Internal server error",
     });
+  }
+}
+
+export async function fixUserCreatedLocations() {
+  try {
+    // Get all locations from the database
+    const locations = await Location.find();
+
+    // Iterate over each location
+    for (const location of locations) {
+      const authorId = location.author_id;
+      const locationId = location._id;
+
+      // Check if the user has this location ID in their createdLocationIds array
+      const user = await User.findOne({ _id: new ObjectId(authorId) });
+
+      if (user && (!user.createdLocationIds || !user.createdLocationIds.includes(locationId))) {
+        // If the user does not have this location ID in their createdLocationIds array, add it
+        await User.updateOne(
+            { _id: new ObjectId(authorId) },
+            { $push: { createdLocationIds: new ObjectId(locationId) } }
+          );
+        console.log(`Added location ID ${locationId} to user ${authorId}`);
+      }
+    }
+
+    console.log("Database fix completed successfully.");
+  } catch (err) {
+    console.error("Error fixing the database:", err);
   }
 }
